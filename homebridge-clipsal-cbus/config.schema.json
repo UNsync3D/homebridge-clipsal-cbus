@@ -1,0 +1,377 @@
+{
+  "pluginAlias": "ClipsalCBus",
+  "pluginType": "platform",
+  "singular": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Platform Name",
+        "type": "string",
+        "default": "Clipsal CBus",
+        "required": true
+      },
+      "host": {
+        "title": "Clipsal Unit IP Address",
+        "type": "string",
+        "placeholder": "e.g. 192.168.1.250",
+        "required": true
+      },
+      "network": {
+        "title": "C-Bus Network ID",
+        "type": "integer",
+        "default": 170,
+        "required": true
+      },
+      "pollInterval": {
+        "title": "Status Poll Interval (seconds)",
+        "type": "integer",
+        "default": 30,
+        "minimum": 5,
+        "maximum": 300
+      },
+      "lights": {
+        "title": "Lights & Dimmers",
+        "type": "array",
+        "items": {
+          "title": "Light",
+          "type": "object",
+          "properties": {
+            "name": {
+              "title": "Name",
+              "type": "string",
+              "required": true
+            },
+            "group": {
+              "title": "C-Bus Group Number",
+              "type": "integer",
+              "required": true
+            },
+            "dimmable": {
+              "title": "Dimmable",
+              "type": "boolean",
+              "default": true
+            }
+          }
+        }
+      },
+      "fans": {
+        "title": "Fans",
+        "type": "array",
+        "items": {
+          "title": "Fan",
+          "type": "object",
+          "properties": {
+            "name": {
+              "title": "Name",
+              "type": "string",
+              "required": true
+            },
+            "group": {
+              "title": "C-Bus Group Number",
+              "type": "integer",
+              "required": true
+            }
+          }
+        }
+      },
+      "blinds": {
+        "title": "Blinds & Curtains",
+        "type": "array",
+        "items": {
+          "title": "Blind",
+          "type": "object",
+          "properties": {
+            "name": {
+              "title": "Name",
+              "type": "string",
+              "required": true
+            },
+            "group": {
+              "title": "C-Bus Group Number",
+              "type": "integer",
+              "required": true
+            }
+          }
+        }
+      },
+      "scenes": {
+        "title": "Scenes",
+        "type": "array",
+        "items": {
+          "title": "Scene",
+          "type": "object",
+          "properties": {
+            "name": {
+              "title": "Scene Name",
+              "type": "string",
+              "required": true
+            },
+            "group": {
+              "title": "Trigger Group Number",
+              "type": "integer",
+              "required": true
+            }
+          }
+        }
+      },
+      "aircon": {
+        "title": "Air Conditioning Zones",
+        "type": "array",
+        "items": {
+          "title": "AC Zone",
+          "type": "object",
+          "properties": {
+            "name": {
+              "title": "Zone Name",
+              "type": "string",
+              "required": true
+            },
+            "powerGroup": {
+              "title": "Power Group (App 48)",
+              "type": "integer",
+              "required": true
+            },
+            "modeGroup": {
+              "title": "Mode Group (App 48)",
+              "type": "integer",
+              "required": true
+            },
+            "fanGroup": {
+              "title": "Fan Group (App 48)",
+              "type": "integer",
+              "required": true
+            },
+            "currentTempGroup": {
+              "title": "Current Temp Group (App 250)",
+              "type": "integer"
+            },
+            "setTempGroup": {
+              "title": "Set Temp Group (App 250)",
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "motion": {
+        "title": "Motion Sensors",
+        "type": "array",
+        "items": {
+          "title": "Motion Sensor",
+          "type": "object",
+          "properties": {
+            "name": {
+              "title": "Name",
+              "type": "string",
+              "required": true
+            },
+            "group": {
+              "title": "C-Bus Group Number (App 56)",
+              "type": "integer",
+              "required": true
+            }
+          }
+        }
+      },
+      "smoke": {
+        "title": "Smoke & Gas Alarms",
+        "type": "array",
+        "items": {
+          "title": "Alarm",
+          "type": "object",
+          "properties": {
+            "name": {
+              "title": "Name",
+              "type": "string",
+              "required": true
+            },
+            "group": {
+              "title": "C-Bus Group Number (App 208)",
+              "type": "integer",
+              "required": true
+            },
+            "type": {
+              "title": "Type",
+              "type": "string",
+              "enum": [
+                "fire",
+                "gas"
+              ],
+              "default": "fire"
+            }
+          }
+        }
+      }
+    }
+  },
+  "layout": [
+    {
+      "type": "section",
+      "title": "Connection",
+      "items": [
+        "name",
+        "host",
+        "network",
+        "pollInterval"
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Lights & Dimmers",
+      "expandable": true,
+      "expanded": true,
+      "items": [
+        {
+          "key": "lights",
+          "type": "array",
+          "items": [
+            {
+              "key": "lights[].name"
+            },
+            {
+              "key": "lights[].group"
+            },
+            {
+              "key": "lights[].dimmable"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Fans",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        {
+          "key": "fans",
+          "type": "array",
+          "items": [
+            {
+              "key": "fans[].name"
+            },
+            {
+              "key": "fans[].group"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Blinds & Curtains",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        {
+          "key": "blinds",
+          "type": "array",
+          "items": [
+            {
+              "key": "blinds[].name"
+            },
+            {
+              "key": "blinds[].group"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Scenes",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        {
+          "key": "scenes",
+          "type": "array",
+          "items": [
+            {
+              "key": "scenes[].name"
+            },
+            {
+              "key": "scenes[].group"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Air Conditioning",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        {
+          "key": "aircon",
+          "type": "array",
+          "items": [
+            {
+              "key": "aircon[].name"
+            },
+            {
+              "key": "aircon[].powerGroup"
+            },
+            {
+              "key": "aircon[].modeGroup"
+            },
+            {
+              "key": "aircon[].fanGroup"
+            },
+            {
+              "key": "aircon[].currentTempGroup"
+            },
+            {
+              "key": "aircon[].setTempGroup"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Motion Sensors",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        {
+          "key": "motion",
+          "type": "array",
+          "items": [
+            {
+              "key": "motion[].name"
+            },
+            {
+              "key": "motion[].group"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "section",
+      "title": "Smoke & Gas Alarms",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        {
+          "key": "smoke",
+          "type": "array",
+          "items": [
+            {
+              "key": "smoke[].name"
+            },
+            {
+              "key": "smoke[].group"
+            },
+            {
+              "key": "smoke[].type"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
