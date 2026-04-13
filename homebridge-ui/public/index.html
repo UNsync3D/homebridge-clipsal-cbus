@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clipsal C-Bus Configuration</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      padding: 20px;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      color: #fff;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h2 span { font-size: 1.3rem; }
+
+    .card {
+      background: #16213e;
+      border: 1px solid #0f3460;
+      border-radius: 10px;
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    .card h3 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #e94560;
+      margin-bottom: 14px;
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+      min-width: 140px;
+    }
+
+    label {
+      font-size: 0.78rem;
+      color: #aaa;
+    }
+
+    input, select {
+      background: #0f3460;
+      border: 1px solid #e94560;
+      border-radius: 6px;
+      color: #fff;
+      padding: 8px 10px;
+      font-size: 0.88rem;
+      width: 100%;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: #fff;
+    }
+
+    .btn {
+      padding: 9px 18px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: opacity 0.15s;
+    }
+
+    .btn:hover { opacity: 0.85; }
+    .btn:active { opacity: 0.7; }
+
+    .btn-primary { background: #e94560; color: #fff; }
+    .btn-success { background: #2ecc71; color: #fff; }
+    .btn-danger  { background: #c0392b; color: #fff; }
+    .btn-sm      { padding: 5px 10px; font-size: 0.78rem; }
+
+    .status {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.83rem;
+      display: none;
+    }
+
+    .status.ok    { background: #1a4731; color: #2ecc71; display: block; }
+    .status.error { background: #4a1020; color: #e74c3c; display: block; }
+
+    /* Device list table */
+    .device-list { width: 100%; border-collapse: collapse; margin-top: 6px; }
+    .device-list th {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: #888;
+      text-align: left;
+      padding: 4px 8px;
+      border-bottom: 1px solid #0f3460;
+    }
+    .device-list td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #0f3460;
+    }
+    .device-list td input {
+      padding: 4px 6px;
+      font-size: 0.82rem;
+    }
+    .device-list td input[type="number"] { width: 70px; }
+    .device-list td input[type="checkbox"] {
+      width: auto;
+      accent-color: #e94560;
+    }
+
+    .add-btn-row { margin-top: 10px; }
+
+    .section-tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .tab {
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      background: #0f3460;
+      color: #aaa;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+    .tab.active { background: #e94560; color: #fff; border-color: #e94560; }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    .save-bar {
+      position: sticky;
+      bottom: 0;
+      background: #1a1a2e;
+      padding: 14px 0 4px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .saved-msg { font-size: 0.82rem; color: #2ecc71; display: none; }
+    .saved-msg.show { display: inline; }
+  </style>
+</head>
+<body>
+
+<h2><span>🏠</span> Clipsal C-Bus Configuration</h2>
+
+<!-- Connection -->
+<div class="card">
+  <h3>Connection</h3>
+  <div class="row">
+    <div class="field">
+      <label>Clipsal IP Address</label>
+      <input type="text" id="host" placeholder="e.g. 192.168.1.100">
+    </div>
+    <div class="field">
+      <label>HTTP Port</label>
+      <input type="number" id="port" value="8087">
+    </div>
+    <div class="field">
+      <label>C-Bus Network ID</label>
+      <input type="number" id="network" value="170">
+    </div>
+    <div class="field">
+      <label>Poll Interval (s)</label>
+      <input type="number" id="pollInterval" value="30" min="5" max="300">
+    </div>
+  </div>
+  <button class="btn btn-primary" onclick="testConnection()">🔌 Test Connection</button>
+  <div id="connStatus" class="status"></div>
+</div>
+
+<!-- Device sections -->
+<div class="section-tabs">
+  <div class="tab active" onclick="showTab('lights')">💡 Lights</div>
+  <div class="tab" onclick="showTab('fans')">🌀 Fans</div>
+  <div class="tab" onclick="showTab('blinds')">🪟 Blinds</div>
+  <div class="tab" onclick="showTab('scenes')">🎬 Scenes</div>
+  <div class="tab" onclick="showTab('aircon')">❄️ Air Con</div>
+</div>
+
+<!-- Lights -->
+<div class="section active card" id="section-lights">
+  <h3>Lights &amp; Dimmers</h3>
+  <table class="device-list">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Group #</th>
+        <th>Dimmable</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="lights-body"></tbody>
+  </table>
+  <div class="add-btn-row">
+    <button class="btn btn-success btn-sm" onclick="addRow('lights')">+ Add Light</button>
+  </div>
+</div>
+
+<!-- Fans -->
+<div class="section card" id="section-fans">
+  <h3>Fans</h3>
+  <table class="device-list">
+    <thead><tr><th>Name</th><th>Group #</th><th></th></tr></thead>
+    <tbody id="fans-body"></tbody>
+  </table>
+  <div class="add-btn-row">
+    <button class="btn btn-success btn-sm" onclick="addRow('fans')">+ Add Fan</button>
+  </div>
+</div>
+
+<!-- Blinds -->
+<div class="section card" id="section-blinds">
+  <h3>Blinds &amp; Curtains</h3>
+  <table class="device-list">
+    <thead><tr><th>Name</th><th>Group #</th><th></th></tr></thead>
+    <tbody id="blinds-body"></tbody>
+  </table>
+  <div class="add-btn-row">
+    <button class="btn btn-success btn-sm" onclick="addRow('blinds')">+ Add Blind</button>
+  </div>
+</div>
+
+<!-- Scenes -->
+<div class="section card" id="section-scenes">
+  <h3>Scenes (Trigger Control)</h3>
+  <table class="device-list">
+    <thead><tr><th>Name</th><th>Trigger Group</th><th>Label ID</th><th></th></tr></thead>
+    <tbody id="scenes-body"></tbody>
+  </table>
+  <div class="add-btn-row">
+    <button class="btn btn-success btn-sm" onclick="addRow('scenes')">+ Add Scene</button>
+  </div>
+</div>
+
+<!-- Aircon -->
+<div class="section card" id="section-aircon">
+  <h3>Air Conditioning Zones</h3>
+  <table class="device-list">
+    <thead>
+      <tr>
+        <th>Zone Name</th>
+        <th>Power Grp</th>
+        <th>Mode Grp</th>
+        <th>Fan Grp</th>
+        <th>CurTemp Grp</th>
+        <th>SetTemp Grp</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="aircon-body"></tbody>
+  </table>
+  <div class="add-btn-row">
+    <button class="btn btn-success btn-sm" onclick="addRow('aircon')">+ Add Zone</button>
+  </div>
+</div>
+
+<!-- Save -->
+<div class="save-bar">
+  <button class="btn btn-primary" onclick="saveConfig()">💾 Save &amp; Restart Homebridge</button>
+  <span class="saved-msg" id="savedMsg">✓ Saved!</span>
+</div>
+
+<script>
+  // Communicate with Homebridge UI
+  let homebridgeApi;
+
+  // Default empty config — fill in your own devices
+  const DEFAULTS = {
+    host: '',
+    port: 8087,
+    network: 0,
+    pollInterval: 30,
+    lights: [],
+    fans: [],
+    blinds: [],
+    scenes: [],
+    aircon: [],
+  };
+
+  // ---- Tab switching ----
+  function showTab(name) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('section-' + name).classList.add('active');
+  }
+
+  // ---- Row builders ----
+  function addRow(type, data = {}) {
+    const tbody = document.getElementById(type + '-body');
+    const tr = document.createElement('tr');
+    tr.setAttribute('data-type', type);
+
+    if (type === 'lights') {
+      tr.innerHTML = `
+        <td><input type="text" placeholder="Name" value="${data.name||''}"></td>
+        <td><input type="number" placeholder="1" value="${data.group??''}"></td>
+        <td><input type="checkbox" ${data.dimmable !== false ? 'checked' : ''}></td>
+        <td><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">✕</button></td>`;
+    } else if (type === 'fans' || type === 'blinds') {
+      tr.innerHTML = `
+        <td><input type="text" placeholder="Name" value="${data.name||''}"></td>
+        <td><input type="number" placeholder="1" value="${data.group??''}"></td>
+        <td><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">✕</button></td>`;
+    } else if (type === 'scenes') {
+      tr.innerHTML = `
+        <td><input type="text" placeholder="Name" value="${data.name||''}"></td>
+        <td><input type="number" placeholder="0" value="${data.group??''}"></td>
+        <td><input type="number" placeholder="0" value="${data.triggerLabel??0}"></td>
+        <td><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">✕</button></td>`;
+    } else if (type === 'aircon') {
+      tr.innerHTML = `
+        <td><input type="text" placeholder="Zone Name" value="${data.name||''}"></td>
+        <td><input type="number" placeholder="0" value="${data.powerGroup??''}"></td>
+        <td><input type="number" placeholder="3" value="${data.modeGroup??''}"></td>
+        <td><input type="number" placeholder="2" value="${data.fanGroup??''}"></td>
+        <td><input type="number" placeholder="2" value="${data.currentTempGroup??''}"></td>
+        <td><input type="number" placeholder="13" value="${data.setTempGroup??''}"></td>
+        <td><button class="btn btn-danger btn-sm" onclick="this.closest('tr').remove()">✕</button></td>`;
+    }
+    tbody.appendChild(tr);
+  }
+
+  function populateRows(type, items) {
+    document.getElementById(type + '-body').innerHTML = '';
+    (items || []).forEach(item => addRow(type, item));
+  }
+
+  function collectRows(type) {
+    const rows = document.querySelectorAll(`#${type}-body tr`);
+    return Array.from(rows).map(tr => {
+      const inputs = tr.querySelectorAll('input');
+      if (type === 'lights') {
+        return { name: inputs[0].value, group: parseInt(inputs[1].value), dimmable: inputs[2].checked };
+      } else if (type === 'fans' || type === 'blinds') {
+        return { name: inputs[0].value, group: parseInt(inputs[1].value) };
+      } else if (type === 'scenes') {
+        return { name: inputs[0].value, group: parseInt(inputs[1].value), triggerLabel: parseInt(inputs[2].value) };
+      } else if (type === 'aircon') {
+        return {
+          name: inputs[0].value,
+          powerGroup: parseInt(inputs[1].value),
+          modeGroup: parseInt(inputs[2].value),
+          fanGroup: parseInt(inputs[3].value),
+          currentTempGroup: parseInt(inputs[4].value),
+          setTempGroup: parseInt(inputs[5].value),
+        };
+      }
+    }).filter(r => r.name);
+  }
+
+  // ---- Connection test ----
+  async function testConnection() {
+    const el = document.getElementById('connStatus');
+    el.className = 'status';
+    el.textContent = '⏳ Testing…';
+    el.style.display = 'block';
+
+    const host    = document.getElementById('host').value;
+    const port    = parseInt(document.getElementById('port').value);
+    const network = parseInt(document.getElementById('network').value);
+
+    try {
+      const res = await homebridgeApi.request('/test-connection', 'POST', { host, port, network });
+      if (res.ok) {
+        el.className = 'status ok';
+        el.textContent = '✓ ' + res.message;
+      } else {
+        el.className = 'status error';
+        el.textContent = '✗ ' + res.message;
+      }
+    } catch (e) {
+      el.className = 'status error';
+      el.textContent = '✗ Could not reach the Clipsal unit. Check IP and port.';
+    }
+  }
+
+  // ---- Save config ----
+  async function saveConfig() {
+    const config = {
+      name: 'Clipsal CBus',
+      host: document.getElementById('host').value,
+      port: parseInt(document.getElementById('port').value),
+      network: parseInt(document.getElementById('network').value),
+      pollInterval: parseInt(document.getElementById('pollInterval').value),
+      lights: collectRows('lights'),
+      fans:   collectRows('fans'),
+      blinds: collectRows('blinds'),
+      scenes: collectRows('scenes'),
+      aircon: collectRows('aircon'),
+    };
+
+    await homebridgeApi.savePluginConfig([config]);
+    await homebridgeApi.updatePluginConfig([config]);
+    await homebridgeApi.restartHomebridgeService();
+
+    const msg = document.getElementById('savedMsg');
+    msg.classList.add('show');
+    setTimeout(() => msg.classList.remove('show'), 3000);
+  }
+
+  // ---- Init ----
+  (async () => {
+    // window.homebridge is injected by Homebridge UI
+    homebridgeApi = window.homebridge;
+
+    // Load existing config or fall back to defaults
+    const existing = await homebridgeApi.getPluginConfig();
+    const cfg = (existing && existing[0]) ? existing[0] : DEFAULTS;
+
+    document.getElementById('host').value         = cfg.host         || DEFAULTS.host;
+    document.getElementById('port').value         = cfg.port         || DEFAULTS.port;
+    document.getElementById('network').value      = cfg.network      || DEFAULTS.network;
+    document.getElementById('pollInterval').value = cfg.pollInterval || DEFAULTS.pollInterval;
+
+    populateRows('lights', cfg.lights || DEFAULTS.lights);
+    populateRows('fans',   cfg.fans   || DEFAULTS.fans);
+    populateRows('blinds', cfg.blinds || DEFAULTS.blinds);
+    populateRows('scenes', cfg.scenes || DEFAULTS.scenes);
+    populateRows('aircon', cfg.aircon || DEFAULTS.aircon);
+
+    homebridgeApi.hideSpinner();
+  })();
+</script>
+</body>
+</html>

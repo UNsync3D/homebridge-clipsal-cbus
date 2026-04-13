@@ -1,0 +1,36 @@
+{
+  "name": "homebridge-clipsal-cbus",
+  "version": "1.0.0",
+  "description": "Homebridge plugin for Clipsal C-Bus 5500SHAC — lights, fans, blinds, scenes and air conditioning via Apple HomeKit",
+  "license": "MIT",
+  "main": "src/index.js",
+  "keywords": [
+    "homebridge-plugin",
+    "clipsal",
+    "cbus",
+    "5500SHAC",
+    "homekit",
+    "automation",
+    "lighting",
+    "aircon",
+    "coolmaster"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/UNsync3D/homebridge-clipsal-cbus.git"
+  },
+  "bugs": {
+    "url": "https://github.com/UNsync3D/homebridge-clipsal-cbus/issues"
+  },
+  "homepage": "https://github.com/UNsync3D/homebridge-clipsal-cbus#readme",
+  "engines": {
+    "homebridge": ">=1.3.0",
+    "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "ws": "^8.0.0"
+  },
+  "peerDependencies": {
+    "homebridge": ">=1.3.0"
+  }
+}
