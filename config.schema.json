@@ -20,7 +20,6 @@
       "network": {
         "title": "C-Bus Network ID",
         "type": "integer",
-        "default": 170,
         "required": true
       },
       "pollInterval": {
@@ -196,8 +195,7 @@
               "enum": [
                 "fire",
                 "gas"
-              ],
-              "default": "fire"
+              ]
             }
           }
         }
